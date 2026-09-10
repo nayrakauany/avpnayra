@@ -6,15 +6,15 @@ const port = 3000;
 
 app.use(express.json());
 
-const alunos = [
-  { id: 1, nome: "Augusto", turma: "2TIB" },
-  { id: 2, nome: "Gustavo", turma: "2TIB" },
-  { id: 3, nome: "Rayssa", turma: "2TIB" },
-  { id: 4, nome: "Amanda", turma: "2TIB" },
-  { id: 5, nome: "Marcos", turma: "2TIB" },
-  { id: 6, nome: "Michelly", turma: "2TIB" },
-  { id: 7, nome: "Maria Fernanda", turma: "2TIB" },
-  { id: 8, nome: "Fellype", turma: "2TIB" }
+const filmes = [
+  { id: 1, titulo: "Interestelar", genero: "Ficção Científica", diretor: "Christopher Nolan", ano: 2014 },
+  { id: 2, titulo: "O Rei Leão", genero: "Animação", diretor: "Jon Favreau", ano: 2019 },
+  { id: 3, titulo: "Django Livre", genero: "Drama", diretor: "Quentin Tarantino", ano: 2012 },
+  { id: 4, titulo: "A Origem", genero: "Ação", diretor: "Christopher Nolan", ano: 2010 },
+  { id: 5, titulo: "Para Todos os Garotos que Já Amei", genero: "Romance", diretor: "Susan Johnson", ano: 2018 },
+  { id: 6, titulo: "Vingadores: Ultimato", genero: "Ação", diretor: "Russo Brothers", ano: 2019 },
+  { id: 7, titulo: "Whiplash", genero: "Drama Musical", diretor: "Damien Chazelle", ano: 2014 },
+  { id: 8, titulo: "A Viagem de Chihiro", genero: "Animação", diretor: "Hayao Miyazaki", ano: 2001 }
 ];
 
 function autenticar(req, res, next) {
@@ -33,82 +33,89 @@ function autenticar(req, res, next) {
 app.get("/", (req, res) => {
   res.json({
     mensagem: "Servidor Express funcionando!",
-    disciplina: "Desenvolvimento de Websites",
-    bimestre: "3º bimestre"
+    tema: "Filmes",
+    categoria: "Catálogo de filmes"
   });
 });
 
-app.get("/alunos", autenticar, (req, res) => {
-  res.json(alunos);
+app.get("/filmes", autenticar, (req, res) => {
+  res.json(filmes);
 });
 
-app.get("/alunos/:id", (req, res) => {
+app.get("/filmes/:id", (req, res) => {
   const id = Number(req.params.id);
 
-  const aluno = alunos.find((aluno) => aluno.id === id);
+  const filme = filmes.find((filme) => filme.id === id);
 
-  if (!aluno) {
+  if (!filme) {
     return res.status(404).json({
-      message: "Aluno não encontrado"
+      message: "Filme não encontrado"
     });
   }
 
-  res.json(aluno);
+  res.json(filme);
 });
 
-app.post("/alunos", autenticar, (req, res) => {
-  const novoAluno = {
-    id: alunos.length + 1,
-    nome: req.body.nome,
-    turma: req.body.turma
+app.post("/filmes", autenticar, (req, res) => {
+  const { titulo, genero, diretor, ano } = req.body;
+
+  if (!titulo || !genero || !diretor || !ano) {
+    return res.status(400).json({
+      message: "Título, gênero, diretor e ano são obrigatórios"
+    });
+  }
+
+  const novoFilme = {
+    id: filmes.length + 1,
+    titulo,
+    genero,
+    diretor,
+    ano
   };
 
-  alunos.push(novoAluno);
+  filmes.push(novoFilme);
 
   res.status(201).json({
-    mensagem: "Aluno cadastrado com sucesso",
-    aluno: novoAluno
+    mensagem: "Filme cadastrado com sucesso",
+    filme: novoFilme
   });
 });
 
-app.patch("/alunos/:id", autenticar, (req, res) => {
+app.patch("/filmes/:id", autenticar, (req, res) => {
   const id = Number(req.params.id);
-  const { nome, turma } = req.body;
+  const { titulo, genero, diretor, ano } = req.body;
 
-  const aluno = alunos.find((aluno) => aluno.id === id);
+  const filme = filmes.find((filme) => filme.id === id);
 
-  if (!aluno) {
+  if (!filme) {
     return res.status(404).json({
-      message: "Aluno não encontrado"
+      message: "Filme não encontrado"
     });
   }
 
-  if (nome) {
-    aluno.nome = nome;
-  }
+  if (titulo) filme.titulo = titulo;
+  if (genero) filme.genero = genero;
+  if (diretor) filme.diretor = diretor;
+  if (ano) filme.ano = ano;
 
-  if (turma) {
-    aluno.turma = turma;
-  }
-
-  res.json(aluno);
+  res.json(filme);
 });
 
-app.delete("/alunos/:id", autenticar, (req, res) => {
+app.delete("/filmes/:id", autenticar, (req, res) => {
   const id = Number(req.params.id);
 
-  const alunoIndex = alunos.findIndex((aluno) => aluno.id === id);
+  const filmeIndex = filmes.findIndex((filme) => filme.id === id);
 
-  if (alunoIndex === -1) {
+  if (filmeIndex === -1) {
     return res.status(404).json({
-      message: "Aluno não encontrado"
+      message: "Filme não encontrado"
     });
   }
 
-  alunos.splice(alunoIndex, 1);
+  filmes.splice(filmeIndex, 1);
 
   res.json({
-    message: "Aluno removido com sucesso"
+    message: "Filme removido com sucesso"
   });
 });
 
